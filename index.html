@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mortgage Playbook</title>
+<style>
+/* ── Reset ───────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;background:#0F0B2D;color:#1a1a2e}
+input,select,button,textarea{font:inherit}
+button{cursor:pointer;border:none;background:none}
+
+/* ── Tokens ──────────────────────────────────────────────────────────── */
+:root{
+  --purple:  #6D28D9;
+  --purple-l:#7C3AED;
+  --purple-d:#4C1D95;
+  --violet:  #8B5CF6;
+  --teal:    #0891B2;
+  --teal-l:  #06B6D4;
+  --green:   #059669;
+  --amber:   #D97706;
+  --red:     #DC2626;
+  --bg:      #F5F3FF;
+  --surface: #FFFFFF;
+  --sidebar: #0F0B2D;
+  --sidebar-border: rgba(255,255,255,0.08);
+  --text:    #111827;
+  --muted:   #6B7280;
+  --border:  #E5E7EB;
+  --shadow:  0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.10), 0 4px 6px rgba(0,0,0,.05);
+  --radius:  10px;
+  --radius-sm:6px;
+}
+
+/* ── App Shell ───────────────────────────────────────────────────────── */
+#app{display:flex;height:100vh;overflow:hidden}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────── */
+.sidebar{
+  width:220px;flex-shrink:0;background:var(--sidebar);
+  display:flex;flex-direction:column;
+  border-right:1px solid var(--sidebar-border);
+  -webkit-app-region:drag;
+}
+.sidebar-logo{
+  padding:28px 20px 20px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--sidebar-border);
+}
+.logo-icon{
+  width:34px;height:34px;background:var(--purple-l);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.logo-text{font-size:14px;font-weight:700;color:#fff;line-height:1.2;letter-spacing:-.3px}
+
+.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 18px;
+  color:rgba(255,255,255,.5);text-decoration:none;font-size:13.5px;font-weight:500;
+  border-radius:0;transition:all .15s;cursor:pointer;
+  border-left:3px solid transparent;-webkit-app-region:no-drag;
+}
+.nav-item:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.05)}
+.nav-item.active{color:#fff;background:rgba(124,58,237,.2);border-left-color:var(--violet)}
+.nav-icon{width:17px;height:17px;flex-shrink:0;opacity:.9}
+
+.sidebar-section{padding:6px 18px 2px;font-size:10px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:.8px;text-transform:uppercase;margin-top:8px}
+
+.sidebar-footer{padding:14px 16px;border-top:1px solid var(--sidebar-border);display:flex;gap:8px;-webkit-app-region:no-drag}
+.btn-ghost{flex:1;padding:7px 0;border-radius:6px;font-size:12px;font-weight:600;color:rgba(255,255,255,.4);background:transparent;border:1px solid rgba(255,255,255,.12);transition:all .15s}
+.btn-ghost:hover{color:#fff;border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.05)}
+
+/* ── Main Content ────────────────────────────────────────────────────── */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+/* #main-content must be a flex column so .content-body can flex:1 and scroll */
+#main-content{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+.content-header{
+  padding:20px 28px 16px;background:var(--surface);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.page-title{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.4px}
+.page-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.content-body{flex:1;overflow-y:auto;padding:24px 28px;min-height:0}
+
+/* ── Cards ───────────────────────────────────────────────────────────── */
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border)}
+.card-header{padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.card-body{padding:16px 20px}
+
+/* ── Metric Cards ────────────────────────────────────────────────────── */
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.metric-card{
+  background:var(--surface);border-radius:var(--radius);padding:18px 20px;
+  border:1px solid var(--border);box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+}
+.metric-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--accent-color,var(--purple));
+}
+.metric-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.metric-value{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1.1}
+.metric-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.metric-badge{
+  display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;margin-top:6px;
+}
+.badge-green{background:#D1FAE5;color:#065F46}
+.badge-amber{background:#FEF3C7;color:#92400E}
+.badge-purple{background:#EDE9FE;color:#5B21B6}
+
+/* ── Dashboard Layout ─────────────────────────────────────────────────── */
+.dash-layout{display:flex;gap:20px;align-items:flex-start}
+.input-panel{width:340px;flex-shrink:0;display:flex;flex-direction:column;gap:14px}
+.results-panel{flex:1;display:flex;flex-direction:column;gap:14px}
+
+/* ── Form Controls ───────────────────────────────────────────────────── */
+.field{display:flex;flex-direction:column;gap:5px}
+.field-label{font-size:12px;font-weight:600;color:var(--muted)}
+.field-row{display:flex;gap:8px}
+.field-row .field{flex:1}
+input[type=number],input[type=date],input[type=text],select{
+  width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-size:14px;font-weight:600;color:var(--text);background:var(--surface);
+  outline:none;transition:border .15s;-webkit-appearance:none;appearance:none;
+}
+input[type=number]:focus,input[type=date]:focus,input[type=text]:focus,select:focus{border-color:var(--purple-l);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.input-prefix{position:relative;display:flex;align-items:center}
+.input-prefix span{position:absolute;left:10px;font-size:14px;font-weight:700;color:var(--muted);pointer-events:none}
+.input-prefix input{padding-left:22px}
+.input-suffix{position:relative;display:flex;align-items:center}
+.input-suffix span{position:absolute;right:10px;font-size:14px;font-weight:700;color:var(--muted);pointer-events:none}
+.input-suffix input{padding-right:24px}
+
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%236B7280' d='M4 6l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:32px}
+
+/* Frequency pills */
+.freq-pills{display:flex;gap:6px}
+.pill{
+  flex:1;padding:8px 6px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;
+  border:1.5px solid var(--border);color:var(--muted);background:var(--surface);
+  text-align:center;transition:all .15s;
+}
+.pill.active,.pill:hover{border-color:var(--purple-l);background:#EDE9FE;color:var(--purple-d)}
+.pill.active{background:var(--purple-l);color:#fff;border-color:var(--purple-l)}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;
+  transition:all .15s;cursor:pointer;border:none}
+.btn-primary{background:var(--purple-l);color:#fff}
+.btn-primary:hover{background:var(--purple-d)}
+.btn-secondary{background:#EDE9FE;color:var(--purple-d);border:1px solid #DDD6FE}
+.btn-secondary:hover{background:#DDD6FE}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-danger{background:#FEE2E2;color:#991B1B}
+.btn-danger:hover{background:#FECACA}
+.btn-full{width:100%}
+.quick-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.quick-btn{padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;
+  border:1.5px solid var(--purple);color:var(--purple);background:transparent;
+  transition:all .15s}
+.quick-btn:hover{background:var(--purple);color:#fff}
+
+/* ── Scenario Tabs ───────────────────────────────────────────────────── */
+.scenario-tabs{display:flex;background:#F3F0FF;border-radius:8px;padding:4px;gap:3px;margin-bottom:14px}
+.scenario-tab{
+  flex:1;padding:7px 12px;border-radius:6px;font-size:12.5px;font-weight:700;
+  color:var(--muted);text-align:center;cursor:pointer;transition:all .15s;
+}
+.scenario-tab.active{background:var(--purple-l);color:#fff;box-shadow:var(--shadow)}
+
+/* ── Scenario Comparison Table ───────────────────────────────────────── */
+.scenario-table{width:100%;border-collapse:collapse;font-size:13px}
+.scenario-table th{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:10px 14px;border-bottom:2px solid var(--border);text-align:left}
+.scenario-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-weight:600;color:var(--text)}
+.scenario-table tr:last-child td{border-bottom:none}
+.scenario-table tr:hover td{background:#FAFAFA}
+.highlight-row td{background:#F5F3FF}
+.positive{color:var(--green)}
+.negative{color:var(--red)}
+
+/* ── Lump Sums Table ─────────────────────────────────────────────────── */
+.lump-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.lump-table th{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border)}
+.lump-table td{padding:6px 8px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
+.lump-table input,.lump-table select{padding:5px 8px;font-size:12px;font-weight:600;border-radius:4px}
+.lump-type-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700}
+.lump-extra{background:#D1FAE5;color:#065F46}
+.lump-withdraw{background:#FEE2E2;color:#991B1B}
+
+/* ── Charts ──────────────────────────────────────────────────────────── */
+.chart-wrap{padding:4px 0 8px;overflow:hidden}
+.chart-legend{display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ── Amortisation Table ──────────────────────────────────────────────── */
+.amort-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.amort-table th{position:sticky;top:0;background:#F9FAFB;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;padding:8px 12px;border-bottom:2px solid var(--border);text-align:right;white-space:nowrap}
+.amort-table th:first-child,.amort-table th:nth-child(2){text-align:left}
+.amort-table td{padding:7px 12px;border-bottom:1px solid #F3F4F6;text-align:right;font-weight:500;color:var(--text)}
+.amort-table td:first-child,.amort-table td:nth-child(2){text-align:left}
+.amort-table tr:hover td{background:#FAFAFA}
+.amort-interest{color:#DC2626}
+.amort-principal{color:#059669}
+
+/* ── Capacity ────────────────────────────────────────────────────────── */
+.capacity-layout{display:grid;grid-template-columns:340px 1fr;gap:20px}
+.capacity-result-card{padding:20px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)}
+.big-number{font-size:32px;font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1}
+.term-rows{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.term-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:8px;background:#F9FAFB;border:1px solid var(--border)}
+.term-label{font-size:13px;font-weight:600;color:var(--muted)}
+.term-value{font-size:14px;font-weight:800;color:var(--text)}
+
+/* ── Warnings ────────────────────────────────────────────────────────── */
+.warning-banner{background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:10px 14px;font-size:12.5px;font-weight:600;color:#92400E;display:flex;align-items:center;gap:8px}
+
+/* ── Filters / Pager ─────────────────────────────────────────────────── */
+.filter-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.filter-chip{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid var(--border);color:var(--muted);background:var(--surface);cursor:pointer;transition:all .15s}
+.filter-chip.active{background:var(--purple-l);color:#fff;border-color:var(--purple-l)}
+.pager{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;color:var(--muted)}
+.pager button{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;background:#EDE9FE;color:var(--purple-d);border:none;cursor:pointer}
+.pager button:disabled{opacity:.3;cursor:default}
+
+/* ── Tooltip ─────────────────────────────────────────────────────────── */
+[data-tip]{position:relative}
+[data-tip]:hover::after{
+  content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:#1F2937;color:#fff;font-size:11px;font-weight:600;padding:5px 9px;border-radius:5px;
+  white-space:nowrap;z-index:100;pointer-events:none;
+}
+
+/* ── Scrollbars ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:10px}
+
+/* ── Animations ──────────────────────────────────────────────────────── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.tab-content{animation:fadeIn .2s ease}
+
+/* ── Divider ─────────────────────────────────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:4px 0}
+
+/* ── Slider ──────────────────────────────────────────────────────────── */
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:#DDD6FE;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--purple-l);cursor:pointer;box-shadow:0 0 0 3px rgba(124,58,237,.2)}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- ── Sidebar ────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">Mortgage<br>Playbook</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">Main</div>
+      <a class="nav-item active" data-tab="dashboard" onclick="setTab('dashboard');return false" href="#">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" data-tab="schedule" onclick="setTab('schedule');return false" href="#">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z"/></svg>
+        Amortisation
+      </a>
+      <a class="nav-item" data-tab="capacity" onclick="setTab('capacity');return false" href="#">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/></svg>
+        Loan Capacity
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-ghost" onclick="loadDemo()">Demo</button>
+      <button class="btn-ghost" onclick="resetState()">Reset</button>
+    </div>
+  </aside>
+
+  <!-- ── Main ──────────────────────────────────────────────────── -->
+  <main class="content">
+    <div id="main-content"></div>
+  </main>
+</div>
+
+<script>
+'use strict';
+/* ════════════════════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════════════════════ */
+const DEMO = {
+  balance: 487500, annualRate: 6.14, termYears: 27, termMonths: 3,
+  redrawAvailable: 18500, frequency: 'monthly', extraPayment: 0,
+  extraFrequency: 'weekly', currentPayment: 1050, currentPaymentFreq: 'weekly',
+  lumpSums: [], daysPerYear: 365
+};
+let S = loadState();
+
+function defaultState() {
+  return {
+    loan: { balance:500000, annualRate:6.14, termYears:25, termMonths:0,
+            redrawAvailable:0, frequency:'monthly', extraPayment:0,
+            extraFrequency:'weekly', currentPayment:0, currentPaymentFreq:'weekly',
+            lumpSums:[], daysPerYear:365 },
+    capacity: { propertyValue:850000, lvr:80, annualRate:6.14, termYears:30,
+                frequency:'monthly', maxRepayment:3500 },
+    activeTab:'dashboard', activeScenario:'minimum', amortPage:0, amortFilter:'all',
+    extraCustom:500
+  };
+}
+function loadState() {
+  try { const s=JSON.parse(localStorage.getItem('mpState')||'null'); return s||defaultState(); }
+  catch(e) { return defaultState(); }
+}
+function saveState() {
+  try { localStorage.setItem('mpState', JSON.stringify(S)); } catch(e){}
+}
+function loadDemo()  { S=defaultState(); Object.assign(S.loan, DEMO); saveState(); renderAll(); }
+function resetState(){ S=defaultState(); saveState(); renderAll(); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   MATH ENGINE
+════════════════════════════════════════════════════════════════════════ */
+function periodsPerYear(freq) { return freq==='weekly'?52:freq==='fortnightly'?26:12; }
+
+function calcMinRepayment(balance, annualRate, termMonths, freq) {
+  if (balance <= 0 || termMonths <= 0) return 0;
+  const ppy = periodsPerYear(freq);
+  const n = Math.max(1, Math.round(termMonths / 12 * ppy));
+  const r = annualRate / 100 / ppy;
+  if (r < 1e-10) return balance / n;
+  return balance * r * Math.pow(1+r, n) / (Math.pow(1+r, n) - 1);
+}
+
+function addPeriod(date, freq) {
+  const d = new Date(date);
+  if (freq === 'monthly')      { d.setMonth(d.getMonth()+1); }
+  else if (freq==='fortnightly'){ d.setDate(d.getDate()+14); }
+  else                          { d.setDate(d.getDate()+7);  }
+  return d;
+}
+
+function daysBetween(a, b) {
+  return Math.round(Math.abs(b-a)/(86400000));
+}
+
+function buildSchedule(params, extraOverride) {
+  const { balance, annualRate, termYears, termMonths, redrawAvailable,
+          frequency, lumpSums, daysPerYear } = params;
+  // The raw extra is stored/entered in extraFrequency terms (e.g. weekly).
+  // Convert it to the bank's payment frequency (e.g. monthly) before building
+  // the schedule, so we don't over-apply it across more periods than intended.
+  const rawExtra = extraOverride !== undefined ? extraOverride : (params.extraPayment||0);
+  const extraFreq = params.extraFrequency || frequency;
+  const extra = rawExtra * periodsPerYear(extraFreq) / periodsPerYear(frequency);
+  const totalMonths = termYears*12 + termMonths;
+  const dailyRate = annualRate / 100 / (daysPerYear||365);
+  const minPmt = calcMinRepayment(balance, annualRate, totalMonths, frequency);
+  const payment = Math.max(minPmt, minPmt + extra);
+  // Maximum balance after a redraw withdrawal = current balance + all available redraw
+  // (this represents the pre-extra-repayment balance ceiling).
+  const maxBalAfterWithdrawal = balance + (redrawAvailable||0);
+
+  const schedule = [];
+  let bal = balance;
+  let redraw = redrawAvailable||0;
+  let curDate = new Date(); curDate.setHours(0,0,0,0);
+  const maxPeriods = Math.ceil(periodsPerYear(frequency)*50);
+
+  while (bal > 0.005 && schedule.length < maxPeriods) {
+    const nextDate = addPeriod(curDate, frequency);
+    const days = daysBetween(curDate, nextDate);
+
+    // Apply lump sums that fall within this payment window
+    const ls = (lumpSums||[]);
+    let lumpTag = null; // for marking this row in the UI
+    for (const l of ls) {
+      const ld = new Date(l.date); ld.setHours(0,0,0,0);
+      if (ld > curDate && ld <= nextDate) {
+        if (l.type === 'extra') {
+          const amt = Math.min(l.amount, bal);
+          bal -= amt; redraw += amt;
+          lumpTag = lumpTag || { type:'extra', amount:l.amount };
+        } else {
+          // Redraw withdrawal — balance rises back toward pre-extra ceiling
+          const amt = Math.min(l.amount, redraw);
+          bal = Math.min(bal + amt, maxBalAfterWithdrawal); // Bug fix: was capped at `balance`
+          redraw = Math.max(0, redraw - amt);
+          lumpTag = lumpTag || { type:'withdrawal', amount:l.amount };
+        }
+      }
+    }
+
+    const interest = bal * dailyRate * days;
+    const actualPmt = Math.min(payment, bal + interest);
+    const intPortion = Math.min(actualPmt, interest);
+    const prinPortion = actualPmt - intPortion;
+    bal = Math.max(0, bal - prinPortion);
+
+    schedule.push({
+      period: schedule.length+1, date: new Date(nextDate),
+      payment: actualPmt, interest: intPortion,
+      principal: prinPortion, balance: bal, redraw,
+      lumpTag  // null unless a lump sum occurred this period
+    });
+    curDate = nextDate;
+    if (bal < 0.005) break;
+  }
+  return schedule;
+}
+
+function scheduleStats(schedule, minSchedule) {
+  if (!schedule.length) return null;
+  const totalInterest = schedule.reduce((s,p)=>s+p.interest,0);
+  const totalPaid = schedule.reduce((s,p)=>s+p.payment,0);
+  const payoffDate = schedule[schedule.length-1].date;
+  const minInterest = minSchedule ? minSchedule.reduce((s,p)=>s+p.interest,0) : totalInterest;
+  const minPayoff = minSchedule ? minSchedule[minSchedule.length-1].date : payoffDate;
+  const daysSaved = minSchedule ? Math.max(0, daysBetween(payoffDate, minPayoff)) : 0;
+  const monthsSaved = Math.round(daysSaved/30.44);
+  // Next 12 months avg
+  const ppy = schedule.length > 0 ? 12 : 1;
+  const next12 = schedule.slice(0, ppy);
+  const intRatio12 = next12.length ? next12.reduce((s,p)=>s+p.interest,0)/next12.reduce((s,p)=>s+p.payment,0) : 0.5;
+  return {
+    payoffDate, totalInterest, totalPaid,
+    interestSaved: minInterest - totalInterest,
+    monthsSaved, daysSaved, intRatio12,
+    paymentAmount: schedule[0].payment
+  };
+}
+
+function calcCapacity(params) {
+  const { maxRepayment, annualRate, termYears, frequency, propertyValue, lvr } = params;
+  const ppy = periodsPerYear(frequency);
+  const n = termYears * ppy;
+  const r = annualRate / 100 / ppy;
+  let maxLoan;
+  if (r < 1e-10) { maxLoan = maxRepayment * n; }
+  else { maxLoan = maxRepayment * (1 - Math.pow(1+r,-n)) / r; }
+  const depositNeeded = propertyValue * (1 - lvr/100);
+  const loanForProperty = propertyValue * (lvr/100);
+  const terms = [30,25,20,15].map(y=>{
+    const pmt = calcMinRepayment(Math.min(maxLoan, loanForProperty), annualRate, y*12, frequency);
+    return { years:y, repayment:pmt };
+  });
+  return { maxLoan, depositNeeded, loanForProperty, terms, maxRepayment };
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   FORMATTERS
+════════════════════════════════════════════════════════════════════════ */
+function fmtAUD(n, decimals=0) {
+  if (!isFinite(n)||isNaN(n)) return '$—';
+  return '$'+Math.abs(n).toLocaleString('en-AU',{minimumFractionDigits:decimals,maximumFractionDigits:decimals});
+}
+function fmtMonths(m) {
+  m = Math.round(m);
+  if (m<=0) return '0 months';
+  const y=Math.floor(m/12), mo=m%12;
+  if (y===0) return `${mo} month${mo!==1?'s':''}`;
+  if (mo===0) return `${y} year${y!==1?'s':''}`;
+  return `${y} yr ${mo} mo`;
+}
+function fmtDate(d) {
+  if (!(d instanceof Date)||isNaN(d)) return '—';
+  return d.toLocaleDateString('en-AU',{month:'short',year:'numeric'});
+}
+function fmtDateFull(d) {
+  if (!(d instanceof Date)||isNaN(d)) return '—';
+  return d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+}
+function fmtPct(n) { return (n*100).toFixed(1)+'%'; }
+function fmtFreq(f) { return f==='monthly'?'Monthly':f==='fortnightly'?'Fortnightly':'Weekly'; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   SVG CHART ENGINE
+════════════════════════════════════════════════════════════════════════ */
+const CHART_COLORS = ['#7C3AED','#06B6D4','#10B981','#F59E0B'];
+
+function buildSVGPath(points) {
+  return points.map((p,i)=>`${i===0?'M':'L'}${p[0]},${p[1]}`).join(' ');
+}
+
+function renderBalanceChart(containerId, schedules) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const W = el.clientWidth||600, H = 220;
+  const PAD = {t:16,r:20,b:40,l:72};
+  const IW = W-PAD.l-PAD.r, IH = H-PAD.t-PAD.b;
+
+  // Sample all schedules to ~80 points each
+  function sample(sched, n=80) {
+    if (!sched||!sched.length) return [];
+    const step = Math.max(1, Math.floor(sched.length/n));
+    return sched.filter((_,i)=>i%step===0||i===sched.length-1);
+  }
+
+  const datasets = schedules.map((s,i)=>({pts:sample(s.schedule), color:s.color||CHART_COLORS[i], label:s.label}));
+  const allBals = datasets.flatMap(d=>d.pts.map(p=>p.balance));
+  const maxVal = Math.max(...allBals, 1);
+
+  // X range: across all dates
+  const allDates = datasets.flatMap(d=>d.pts.map(p=>p.date.getTime()));
+  const minT = Math.min(...allDates), maxT = Math.max(...allDates);
+  const tRange = Math.max(maxT-minT, 1);
+
+  const xS = t => ((t-minT)/tRange)*IW;
+  const yS = v => IH - (v/maxVal)*IH;
+
+  let paths='', areas='';
+  datasets.forEach(ds=>{
+    if (!ds.pts.length) return;
+    const pts = ds.pts.map(p=>[xS(p.date.getTime()), yS(p.balance)]);
+    const linePath = buildSVGPath(pts);
+    const areaPath = `${linePath} L${pts[pts.length-1][0]},${IH} L${pts[0][0]},${IH} Z`;
+    areas += `<path d="${areaPath}" fill="${ds.color}" fill-opacity=".07"/>`;
+    paths += `<path d="${linePath}" fill="none" stroke="${ds.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  });
+
+  // Y gridlines
+  let grid='', yLabels='';
+  for (let i=0;i<=4;i++) {
+    const v=maxVal/4*(4-i), y=yS(v);
+    grid+=`<line x1="0" y1="${y.toFixed(1)}" x2="${IW}" y2="${y.toFixed(1)}" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="3,3"/>`;
+    yLabels+=`<text x="-8" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="10" fill="#9CA3AF">${fmtAUD(v/1000)}k</text>`;
+  }
+
+  // X labels (5 ticks)
+  let xLabels='';
+  for (let i=0;i<=4;i++) {
+    const t=minT+(tRange/4)*i;
+    const d=new Date(t);
+    const x=(xS(t)).toFixed(1);
+    xLabels+=`<text x="${x}" y="${IH+20}" text-anchor="middle" font-size="10" fill="#9CA3AF">${fmtDate(d)}</text>`;
+  }
+
+  // Legend
+  const legend = datasets.map((ds,i)=>
+    `<rect x="${i*120}" y="0" width="10" height="10" rx="3" fill="${ds.color}"/>
+     <text x="${i*120+14}" y="9" font-size="11" fill="#6B7280" font-weight="600">${ds.label}</text>`
+  ).join('');
+
+  el.innerHTML = `
+    <div class="chart-legend" style="padding:0 0 4px 72px">${datasets.map((ds,i)=>`
+      <div class="legend-item"><div class="legend-dot" style="background:${ds.color}"></div>${ds.label}</div>`).join('')}
+    </div>
+    <svg width="100%" viewBox="0 0 ${W} ${H}" style="overflow:visible">
+      <g transform="translate(${PAD.l},${PAD.t})">
+        ${grid}${areas}${paths}${yLabels}${xLabels}
+      </g>
+    </svg>`;
+}
+
+function renderPaymentChart(containerId, schedule) {
+  const el = document.getElementById(containerId);
+  if (!el||!schedule.length) return;
+  const W = el.clientWidth||600, H = 200;
+  const PAD = {t:16,r:20,b:40,l:72};
+  const IW = W-PAD.l-PAD.r, IH = H-PAD.t-PAD.b;
+
+  function sample(s, n=60) {
+    const step=Math.max(1,Math.floor(s.length/n));
+    return s.filter((_,i)=>i%step===0);
+  }
+  const pts = sample(schedule);
+  const maxPmt = Math.max(...pts.map(p=>p.payment));
+
+  const allDates = pts.map(p=>p.date.getTime());
+  const minT=allDates[0]||0, maxT=allDates[allDates.length-1]||1;
+  const tRange=Math.max(maxT-minT,1);
+  const xS=t=>((t-minT)/tRange)*IW;
+  const yS=v=>IH-(v/maxPmt)*IH;
+
+  // Stacked area: interest (bottom) then principal (top)
+  const intPts  = pts.map(p=>[xS(p.date.getTime()), yS(p.interest)]);
+  const pmtPts  = pts.map(p=>[xS(p.date.getTime()), yS(p.payment)]);
+  const botPts  = pts.map((_,i)=>[intPts[i][0], IH]);
+
+  const intArea  = buildSVGPath(intPts) +` L${intPts[intPts.length-1][0]},${IH} L${intPts[0][0]},${IH} Z`;
+  const prinArea = buildSVGPath(pmtPts) +` L${pmtPts[pmtPts.length-1][0]},${IH} L${pmtPts[0][0]},${IH} Z`;
+
+  let grid='', yLabels='';
+  for (let i=0;i<=3;i++) {
+    const v=maxPmt/3*(3-i), y=yS(v);
+    grid+=`<line x1="0" y1="${y.toFixed(1)}" x2="${IW}" y2="${y.toFixed(1)}" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="3,3"/>`;
+    yLabels+=`<text x="-8" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="10" fill="#9CA3AF">${fmtAUD(v)}</text>`;
+  }
+  let xLabels='';
+  for (let i=0;i<=4;i++) {
+    const t=minT+(tRange/4)*i;
+    const x=(xS(t)).toFixed(1);
+    xLabels+=`<text x="${x}" y="${IH+20}" text-anchor="middle" font-size="10" fill="#9CA3AF">${fmtDate(new Date(t))}</text>`;
+  }
+
+  el.innerHTML=`
+    <div class="chart-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>Principal</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#EF4444"></div>Interest</div>
+    </div>
+    <svg width="100%" viewBox="0 0 ${W} ${H}" style="overflow:visible">
+      <g transform="translate(${PAD.l},${PAD.t})">
+        ${grid}
+        <path d="${prinArea}" fill="#10B981" fill-opacity=".25"/>
+        <path d="${intArea}" fill="#EF4444" fill-opacity=".35"/>
+        <path d="${buildSVGPath(pmtPts)}" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+        <path d="${buildSVGPath(intPts)}" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-dasharray="5,3"/>
+        ${yLabels}${xLabels}
+      </g>
+    </svg>`;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   RENDER — DASHBOARD
+════════════════════════════════════════════════════════════════════════ */
+function renderDashboard() {
+  const L = S.loan;
+  const totalMonths = L.termYears*12 + L.termMonths;
+  const minPmt = calcMinRepayment(L.balance, L.annualRate, totalMonths, L.frequency);
+  // Always compute the canonical monthly and weekly amounts for display,
+  // regardless of which frequency the bank uses.
+  const minMonthly = calcMinRepayment(L.balance, L.annualRate, totalMonths, 'monthly');
+  const minWeekly  = minMonthly * 12 / 52;
+
+  // TRUE minimum baseline: no lump sums, no extra repayments.
+  // Stripping lump sums from the baseline is critical — without this, adding a
+  // lump sum shifts both the baseline and the scenarios equally, so comparisons
+  // show zero difference and it looks like nothing happened.
+  const cleanL = { ...L, lumpSums: [], extraFrequency: L.frequency };
+  const minSched   = buildSchedule(cleanL, 0);
+  const extraSched = buildSchedule(L, L.extraPayment||0);
+  const customSched= buildSchedule(L, S.extraCustom||0);
+
+  const minStats   = scheduleStats(minSched, null);
+  const extraStats = scheduleStats(extraSched, minSched);
+  const customStats= scheduleStats(customSched, minSched);
+
+  // Lump-sum-only impact: minimum payments + lump sums, no regular extra.
+  // Lets us isolate exactly what the lump sums are contributing.
+  const lumpOnlySched = L.lumpSums.length > 0
+    ? buildSchedule({ ...L, extraFrequency: L.frequency }, 0)
+    : null;
+  const lumpImpactStats = lumpOnlySched ? scheduleStats(lumpOnlySched, minSched) : null;
+
+  // ── "What I'm Currently Paying" scenario ────────────────────────────
+  // Convert user's current payment to annual, subtract minimum annual,
+  // then re-express the surplus in the bank's payment frequency.
+  const hasActual = (L.currentPayment||0) > 0;
+  const currentPayFreq = L.currentPaymentFreq || 'weekly';
+  const currentAnnual  = (L.currentPayment||0) * periodsPerYear(currentPayFreq);
+  const minAnnual      = minPmt * periodsPerYear(L.frequency);
+  const extraAnnual    = Math.max(0, currentAnnual - minAnnual);
+  const extraBankFreq  = extraAnnual / periodsPerYear(L.frequency);
+  // Pass extra already in bank-freq units; set extraFrequency = frequency so no double-conversion
+  const actualParams   = { ...L, extraFrequency: L.frequency };
+  const actualSched    = hasActual ? buildSchedule(actualParams, extraBankFreq) : null;
+  const actualStats    = actualSched ? scheduleStats(actualSched, minSched) : null;
+  // Weekly equiv of what they're paying
+  const currentWeekly  = currentAnnual / 52;
+  const currentMonthly = currentAnnual / 12;
+  const impliedExtraWeekly  = Math.max(0, currentWeekly  - minWeekly);
+  const impliedExtraMonthly = Math.max(0, currentMonthly - minMonthly);
+  const isUnderpaying = hasActual && currentAnnual < minAnnual;
+
+  // Warning: negative amortisation
+  const interestPerPeriod = L.balance * (L.annualRate/100) / periodsPerYear(L.frequency);
+  const negAmort = minPmt < interestPerPeriod;
+
+  // Scenario display (Actual only shown when user has entered a current payment)
+  const scenarios = [
+    { id:'minimum', label:'Minimum',         stats:minStats,    color:CHART_COLORS[0] },
+    ...(hasActual ? [{ id:'actual', label:'Actual (you)', stats:actualStats, color:'#F59E0B' }] : []),
+    { id:'extra',   label:'+Extra',           stats:extraStats,  color:CHART_COLORS[1] },
+    { id:'custom',  label:'Custom',           stats:customStats, color:CHART_COLORS[2] },
+  ];
+
+  function metricCard(label, value, sub, color, badge) {
+    return `<div class="metric-card" style="--accent-color:${color}">
+      <div class="metric-label">${label}</div>
+      <div class="metric-value">${value}</div>
+      ${sub?`<div class="metric-sub">${sub}</div>`:''}
+      ${badge?`<span class="metric-badge ${badge.cls}">${badge.text}</span>`:''}
+    </div>`;
+  }
+
+  const payoffDate = minStats ? fmtDateFull(minStats.payoffDate) : '—';
+  const totalMonthsLeft = minSched.length ? minSched.length : totalMonths;
+
+  const html = `
+  <div class="content-header">
+    <div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Australian home loan calculator with redraw & scenario modelling</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      ${negAmort?`<div class="warning-banner">⚠ Payment below interest — negative amortisation risk</div>`:''}
+    </div>
+  </div>
+  <div class="content-body">
+    <div class="dash-layout">
+      <!-- LEFT: Inputs -->
+      <div class="input-panel">${renderInputPanel(L, minPmt, minWeekly, minMonthly, minAnnual, actualStats, lumpImpactStats)}</div>
+      <!-- RIGHT: Results -->
+      <div class="results-panel">
+        <!-- Key metrics -->
+        <div class="metrics-grid">
+          ${metricCard('Remaining Balance', fmtAUD(L.balance), `Redraw available: ${fmtAUD(L.redrawAvailable)}`, '#6D28D9', null)}
+          ${metricCard('Interest Rate', L.annualRate.toFixed(2)+'% p.a.', `Bank debits ${fmtFreq(L.frequency).toLowerCase()}`, '#0891B2', null)}
+          ${metricCard('Min Repayment', fmtAUD(minMonthly,2)+'/mo', `${fmtAUD(minWeekly,2)}/wk &nbsp;·&nbsp; ${fmtAUD(minPmt,2)}/${L.frequency==='monthly'?'mo':L.frequency==='fortnightly'?'fn':'wk'} bank debit`, '#059669', null)}
+          ${metricCard('Time Remaining', fmtMonths(totalMonthsLeft), `Payoff: ${payoffDate}`, '#7C3AED', null)}
+          ${metricCard('Total Interest', fmtAUD(minStats?.totalInterest||0), 'at minimum repayments', '#D97706', null)}
+          ${metricCard('Interest Ratio (yr 1)', fmtPct(minStats?.intRatio12||0), 'of each payment is interest', '#DC2626', null)}
+        </div>
+
+        <!-- Scenario comparison -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Scenario Comparison</div>
+          </div>
+          <div class="card-body" style="padding-top:12px">
+            <div class="scenario-tabs">
+              ${scenarios.map(sc=>`
+                <div class="scenario-tab ${S.activeScenario===sc.id?'active':''}"
+                     onclick="S.activeScenario='${sc.id}';saveState();renderAll()">${sc.label}</div>`).join('')}
+            </div>
+            <table class="scenario-table">
+              <thead><tr>
+                <th>Scenario</th><th>Repayment</th><th>Payoff Date</th>
+                <th>Time Saved</th><th>Total Interest</th><th>Interest Saved</th>
+              </tr></thead>
+              <tbody>
+              ${scenarios.map(sc=>{
+                if (!sc.stats) return `<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:14px">No data</td></tr>`;
+                const freq = L.frequency;
+                const bankAmt = sc.stats.paymentAmount;
+                // Convert to monthly for a consistent display reference
+                const bankPpy = periodsPerYear(freq);
+                const monthly = bankAmt * bankPpy / 12;
+                const weekly  = bankAmt * bankPpy / 52;
+                const pmtLabel = `<div style="font-weight:800">${fmtAUD(monthly,2)}<span style="font-weight:500;color:var(--muted)">/mo</span></div>
+                  <div style="font-size:11px;color:var(--muted)">${fmtAUD(weekly,2)}/wk &nbsp;·&nbsp; ${fmtAUD(bankAmt,2)}/${freq==='monthly'?'mo':freq==='fortnightly'?'fn':'wk'} debit</div>`;
+                return `<tr class="${S.activeScenario===sc.id?'highlight-row':''}">
+                  <td style="font-weight:800;color:${sc.color}">${sc.label}</td>
+                  <td>${pmtLabel}</td>
+                  <td>${fmtDateFull(sc.stats.payoffDate)}</td>
+                  <td class="${sc.stats.monthsSaved>0?'positive':''}">${sc.stats.monthsSaved>0?fmtMonths(sc.stats.monthsSaved)+' less':'—'}</td>
+                  <td>${fmtAUD(sc.stats.totalInterest)}</td>
+                  <td class="${sc.stats.interestSaved>0?'positive':''}">${sc.stats.interestSaved>1?fmtAUD(sc.stats.interestSaved):'—'}</td>
+                </tr>`;
+              }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Extra repayment custom slider -->
+        ${(()=>{
+          const extraF = L.extraFrequency||'weekly';
+          const bankF  = L.frequency;
+          const extraPpy = periodsPerYear(extraF);
+          const bankPpy  = periodsPerYear(bankF);
+          const customRaw = S.extraCustom||0;
+          const customMonthly = customRaw * extraPpy / 12;
+          const customConverted = customRaw * extraPpy / bankPpy;
+          const extraLabel = extraF==='weekly'?'/wk':extraF==='fortnightly'?'/fn':'/mo';
+          return `<div class="card">
+            <div class="card-header">
+              <div class="card-title">Custom Extra Repayment</div>
+              <div>
+                <div style="font-size:20px;font-weight:900;color:var(--purple-l);line-height:1">${fmtAUD(customRaw,0)}<span style="font-size:13px;font-weight:600;color:var(--muted)"> extra${extraLabel}</span></div>
+                ${extraF!==bankF&&customRaw>0?`<div style="font-size:11px;color:var(--green);font-weight:700;text-align:right">= ${fmtAUD(customConverted,2)}/${bankF==='monthly'?'mo':bankF==='fortnightly'?'fn':'wk'} bank debit</div>`:''}
+              </div>
+            </div>
+            <div class="card-body">
+              <input type="range" min="0" max="2000" step="25" value="${customRaw}"
+                oninput="S.extraCustom=+this.value;saveState();renderAll()">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px">
+                <span>$0${extraLabel}</span><span>$2,000${extraLabel}</span>
+              </div>
+              ${customRaw>0?`<div style="font-size:12px;font-weight:700;color:var(--muted);margin-top:8px">
+                ${fmtAUD(customMonthly,2)}/mo &nbsp;·&nbsp; ${fmtAUD(customRaw*extraPpy/52,2)}/wk (annual avg)
+              </div>`:''}
+              <div class="quick-btns" style="margin-top:10px">
+                ${[0,50,100,200,500].map(v=>`<button class="quick-btn ${S.extraCustom===v?'active':''}"
+                  onclick="S.extraCustom=${v};saveState();renderAll()">+${v===0?'$0':fmtAUD(v)}${extraLabel}</button>`).join('')}
+              </div>
+            </div>
+          </div>`;
+        })()}
+
+        <!-- Balance Chart -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Loan Balance Over Time</div></div>
+          <div class="card-body">
+            <div class="chart-wrap" id="balance-chart-wrap"></div>
+          </div>
+        </div>
+
+        <!-- Payment breakdown chart -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Interest vs Principal Over Time</div>
+            <div style="font-size:11px;color:var(--muted)">
+              ${S.activeScenario==='minimum'?'Minimum':S.activeScenario==='extra'?'+Extra':'Custom'} scenario
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap" id="payment-chart-wrap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('main-content').innerHTML = html;
+  wireInputs();
+
+  // Draw charts
+  const activeSched = S.activeScenario==='actual' ? (actualSched||minSched)
+    : S.activeScenario==='extra'  ? extraSched
+    : S.activeScenario==='custom' ? customSched
+    : minSched;
+
+  const chartDatasets = [
+    {schedule:minSched,   label:'Minimum'},
+    ...(actualSched ? [{schedule:actualSched, label:'Actual (you)', color:'#F59E0B'}] : []),
+    {schedule:extraSched, label:'+Extra'},
+    {schedule:customSched,label:'Custom'},
+  ];
+  renderBalanceChart('balance-chart-wrap', chartDatasets);
+  renderPaymentChart('payment-chart-wrap', activeSched);
+}
+
+function renderInputPanel(L, minPmt, minWeekly, minMonthly, minAnnual, actualStats, lumpImpactStats) {
+  const totalMonths = L.termYears*12 + L.termMonths;
+  return `
+  <div class="card">
+    <div class="card-header"><div class="card-title">Loan Details</div></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="field">
+        <label class="field-label">Remaining Balance</label>
+        <div class="input-prefix"><span>$</span>
+          <input type="number" id="inp-balance" value="${L.balance}" min="0" step="1000"
+            onchange="updLoan('balance',+this.value)">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Annual Interest Rate</label>
+        <div class="input-suffix"><span>%</span>
+          <input type="number" id="inp-rate" value="${L.annualRate}" min="0" max="30" step="0.01"
+            onchange="updLoan('annualRate',+this.value)">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label">Years Remaining</label>
+          <input type="number" id="inp-years" value="${L.termYears}" min="0" max="30" step="1"
+            onchange="updLoan('termYears',+this.value)">
+        </div>
+        <div class="field">
+          <label class="field-label">Months</label>
+          <input type="number" id="inp-months" value="${L.termMonths}" min="0" max="11" step="1"
+            onchange="updLoan('termMonths',+this.value)">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" data-tip="Extra repayments you've made that can be re-drawn">Redraw Available</label>
+        <div class="input-prefix"><span>$</span>
+          <input type="number" id="inp-redraw" value="${L.redrawAvailable}" min="0" step="500"
+            onchange="updLoan('redrawAvailable',+this.value)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="border-top:3px solid #F59E0B">
+    <div class="card-header"><div class="card-title" style="color:#92400E">💳 What I'm Currently Paying</div></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+
+      <div class="field">
+        <label class="field-label">I pay this amount per:</label>
+        <div class="freq-pills">
+          ${['weekly','fortnightly','monthly'].map(f=>`
+            <div class="pill ${(L.currentPaymentFreq||'weekly')===f?'active':''}"
+              onclick="updLoan('currentPaymentFreq','${f}')">${fmtFreq(f)}</div>`).join('')}
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Amount I pay</label>
+        <div class="input-prefix"><span>$</span>
+          <input type="number" value="${L.currentPayment||0}" min="0" step="50"
+            onchange="updLoan('currentPayment',+this.value)" placeholder="0">
+        </div>
+      </div>
+
+      ${(()=>{
+        const cpFreq = L.currentPaymentFreq||'weekly';
+        const cp = L.currentPayment||0;
+        if (cp <= 0) return `<div style="font-size:12px;color:var(--muted);text-align:center;padding:4px 0">Enter your current payment to see its impact</div>`;
+
+        // Build display values — all in weekly/monthly for clarity
+        const cpAnnual   = cp * periodsPerYear(cpFreq);
+        const cpWeekly   = cpAnnual / 52;
+        const cpMonthly  = cpAnnual / 12;
+        const extraWk    = cpWeekly  - minWeekly;
+        const extraMo    = cpMonthly - minMonthly;
+        const underpay   = cpAnnual < minAnnual;
+
+        if (underpay) {
+          const shortfallWk = minWeekly - cpWeekly;
+          return `<div class="warning-banner" style="flex-direction:column;align-items:flex-start;gap:4px">
+            <strong>⚠ Underpaying by ${fmtAUD(shortfallWk,2)}/wk</strong>
+            <span>Your payment of ${fmtAUD(cpWeekly,2)}/wk is below the minimum ${fmtAUD(minWeekly,2)}/wk</span>
+          </div>`;
+        }
+
+        const savedMonths = actualStats?.monthsSaved || 0;
+        const savedInt    = actualStats?.interestSaved || 0;
+        const payoffD     = actualStats ? fmtDateFull(actualStats.payoffDate) : '—';
+
+        return `<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.5px">You pay</div>
+              <div style="font-size:16px;font-weight:900;color:#78350F">${fmtAUD(cpWeekly,2)}/wk</div>
+              <div style="font-size:11px;color:#92400E">${fmtAUD(cpMonthly,2)}/mo</div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.5px">Minimum</div>
+              <div style="font-size:16px;font-weight:900;color:#92400E">${fmtAUD(minWeekly,2)}/wk</div>
+              <div style="font-size:11px;color:#92400E">${fmtAUD(minMonthly,2)}/mo</div>
+            </div>
+          </div>
+          <div style="margin:10px 0;height:1px;background:#FDE68A"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#065F46;text-transform:uppercase;letter-spacing:.5px">Extra per week</div>
+              <div style="font-size:18px;font-weight:900;color:#065F46">+${fmtAUD(extraWk,2)}/wk</div>
+              <div style="font-size:11px;color:#059669">+${fmtAUD(extraMo,2)}/mo</div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#065F46;text-transform:uppercase;letter-spacing:.5px">Impact</div>
+              <div style="font-size:13px;font-weight:800;color:#065F46">${savedMonths>0?fmtMonths(savedMonths)+' sooner':'—'}</div>
+              <div style="font-size:11px;color:#059669">${savedInt>0?fmtAUD(savedInt)+' interest saved':'—'}</div>
+            </div>
+          </div>
+          ${savedMonths>0?`<div style="margin-top:8px;padding:6px 10px;background:#D1FAE5;border-radius:6px;font-size:12px;font-weight:700;color:#065F46;text-align:center">
+            🎯 Payoff ${payoffD} &nbsp;·&nbsp; ${fmtMonths(savedMonths)} ahead of minimum
+          </div>`:''}
+        </div>`;
+      })()}
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">Repayment Settings</div></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+
+      <div class="field">
+        <label class="field-label">Bank Payment Frequency</label>
+        <div class="freq-pills">
+          ${['weekly','fortnightly','monthly'].map(f=>`
+            <div class="pill ${L.frequency===f?'active':''}" onclick="updLoan('frequency','${f}')">${fmtFreq(f)}</div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Minimum repayment callout -->
+      <div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:10px 12px">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Minimum Bank Repayment</div>
+        <div style="font-size:20px;font-weight:900;color:var(--purple-d)">${fmtAUD(minPmt,2)}<span style="font-size:13px;font-weight:600;color:var(--muted)">/${L.frequency==='monthly'?'mo':L.frequency==='fortnightly'?'fn':'wk'}</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">≈ ${fmtAUD(minWeekly,2)}/wk &nbsp;·&nbsp; ${fmtAUD(minMonthly,2)}/mo</div>
+      </div>
+
+      <!-- Extra repayment with its own budget frequency -->
+      <div class="field">
+        <label class="field-label">Extra Repayment — entered per:</label>
+        <div class="freq-pills" style="margin-bottom:8px">
+          ${['weekly','fortnightly','monthly'].map(f=>`
+            <div class="pill ${L.extraFrequency===f?'active':''}" onclick="updLoan('extraFrequency','${f}')">${fmtFreq(f)}</div>`).join('')}
+        </div>
+        <div class="input-prefix"><span>$</span>
+          <input type="number" id="inp-extra" value="${L.extraPayment||0}" min="0" step="50"
+            onchange="updLoan('extraPayment',+this.value)">
+        </div>
+        ${(()=>{
+          const extraF = L.extraFrequency||'weekly';
+          const bankF  = L.frequency;
+          if (extraF !== bankF && (L.extraPayment||0) > 0) {
+            const converted = (L.extraPayment||0) * periodsPerYear(extraF) / periodsPerYear(bankF);
+            return `<div style="font-size:11px;color:var(--green);font-weight:700;margin-top:4px">
+              = ${fmtAUD(converted,2)}/${bankF==='monthly'?'mo':bankF==='fortnightly'?'fn':'wk'} added to bank repayment
+            </div>`;
+          }
+          return '';
+        })()}
+        <div class="quick-btns">
+          ${[0,50,100,200,500].map(v=>`<button class="quick-btn" onclick="updLoan('extraPayment',${v})">+${v===0?'$0':fmtAUD(v)}</button>`).join('')}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">One-off Lump Sums</div>
+      <button class="btn btn-sm btn-secondary" onclick="addLumpSum()">+ Add</button>
+    </div>
+    <div class="card-body" style="padding-top:10px;display:flex;flex-direction:column;gap:12px">
+
+      ${L.lumpSums.length===0
+        ? `<div style="text-align:center;color:var(--muted);font-size:12.5px;padding:8px 0">
+            No lump sums yet — add a one-off extra payment or a redraw withdrawal
+           </div>`
+        : `<div style="display:flex;flex-direction:column;gap:8px">
+            ${L.lumpSums.map((ls,i)=>{
+              const isExtra    = ls.type === 'extra';
+              const cardBg     = isExtra ? '#F0FDF4' : '#FFF1F2';
+              const cardBorder = isExtra ? '#86EFAC' : '#FECACA';
+              const numLabel   = L.lumpSums.length > 1
+                ? `<span style="font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0">#${i+1}</span>` : '';
+              return `<div style="border:1px solid ${cardBorder};border-radius:8px;padding:10px 12px;background:${cardBg}">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+                  ${numLabel}
+                  <select class="lump-type-sel" data-idx="${i}"
+                    style="flex:1;min-width:0;padding:5px 8px;font-size:12px;font-weight:600;border-radius:4px;border:1px solid #D1D5DB;background:#fff">
+                    <option value="extra"      ${ls.type==='extra'?'selected':''}>⬇ Extra Payment</option>
+                    <option value="withdrawal" ${ls.type==='withdrawal'?'selected':''}>⬆ Redraw Funds</option>
+                  </select>
+                  <button class="btn btn-sm btn-danger lump-del-btn" data-idx="${i}"
+                    style="white-space:nowrap;flex-shrink:0;padding:5px 10px">✕ Remove</button>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <input type="date" class="lump-date-inp" data-idx="${i}" value="${ls.date}"
+                    style="flex:1;min-width:0;padding:5px 8px;font-size:12px;font-weight:600;border-radius:4px;border:1px solid #D1D5DB;background:#fff">
+                  <div class="input-prefix" style="flex:1;min-width:0"><span>$</span>
+                    <input type="number" class="lump-amt-inp" data-idx="${i}" value="${ls.amount}" min="0" step="1000"
+                      style="padding-left:20px;font-size:12px;font-weight:600;min-width:0;width:100%">
+                  </div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>`}
+
+      ${(()=>{
+        if (!lumpImpactStats || L.lumpSums.length === 0) return '';
+        const { monthsSaved, interestSaved, payoffDate } = lumpImpactStats;
+        const totalExtra = L.lumpSums.filter(l=>l.type==='extra').reduce((s,l)=>s+l.amount,0);
+        const totalWithdraw = L.lumpSums.filter(l=>l.type!=='extra').reduce((s,l)=>s+l.amount,0);
+        return `<div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:12px">
+          <div style="font-size:10px;font-weight:800;color:#166534;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">
+            ✦ Lump Sum Impact vs Minimum
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#166534;opacity:.7;text-transform:uppercase">Extra paid</div>
+              <div style="font-size:15px;font-weight:900;color:#15803D">${fmtAUD(totalExtra)}</div>
+            </div>
+            ${totalWithdraw>0?`<div>
+              <div style="font-size:10px;font-weight:700;color:#991B1B;opacity:.7;text-transform:uppercase">Redrawn</div>
+              <div style="font-size:15px;font-weight:900;color:#DC2626">${fmtAUD(totalWithdraw)}</div>
+            </div>`:''}
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#166534;opacity:.7;text-transform:uppercase">Time saved</div>
+              <div style="font-size:15px;font-weight:900;color:#15803D">${monthsSaved>0?fmtMonths(monthsSaved):'—'}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#166534;opacity:.7;text-transform:uppercase">Interest saved</div>
+              <div style="font-size:15px;font-weight:900;color:#15803D">${interestSaved>1?fmtAUD(interestSaved):'—'}</div>
+            </div>
+          </div>
+          ${monthsSaved>0?`<div style="margin-top:8px;padding:5px 10px;background:#DCFCE7;border-radius:6px;font-size:11.5px;font-weight:700;color:#166534;text-align:center">
+            🗓 New payoff: ${fmtDateFull(payoffDate)}
+          </div>`:''}
+        </div>`;
+      })()}
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">Advanced</div></div>
+    <div class="card-body">
+      <div class="field">
+        <label class="field-label">Days Per Year (interest calc)</label>
+        <div class="freq-pills">
+          ${[365,360].map(d=>`<div class="pill ${L.daysPerYear===d?'active':''}" onclick="updLoan('daysPerYear',${d})">${d} days</div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   RENDER — AMORTISATION SCHEDULE
+════════════════════════════════════════════════════════════════════════ */
+function renderSchedule() {
+  const L = S.loan;
+  // For "Minimum" scenario in the schedule view, still show lump sums (they're real events)
+  // but use no extra regular repayments. Other scenarios include lump sums + extras.
+  const extra = S.activeScenario==='minimum'?0:S.activeScenario==='extra'?L.extraPayment:S.extraCustom;
+  const schedParams = S.activeScenario==='minimum' ? {...L, extraFrequency: L.frequency} : L;
+  const schedule = buildSchedule(schedParams, extra);
+  const PAGE_SIZE = 50;
+  const filter = S.amortFilter||'all';
+
+  let rows;
+  if (filter==='12mo') {
+    const ppy = periodsPerYear(L.frequency);
+    rows = schedule.slice(0, ppy);
+  } else if (filter==='all') {
+    rows = schedule;
+  } else {
+    rows = schedule;
+  }
+
+  const totalPages = Math.ceil(rows.length/PAGE_SIZE);
+  const page = Math.min(S.amortPage||0, totalPages-1);
+  const pageRows = rows.slice(page*PAGE_SIZE, (page+1)*PAGE_SIZE);
+
+  const totalInterest = schedule.reduce((s,p)=>s+p.interest,0);
+  const totalPrincipal = schedule.reduce((s,p)=>s+p.principal,0);
+
+  // CSV export
+  function exportCSV() {
+    const header = 'Period,Date,Payment,Interest,Principal,Balance,Redraw\n';
+    const body = schedule.map(r=>
+      [r.period, fmtDateFull(r.date), r.payment.toFixed(2), r.interest.toFixed(2),
+       r.principal.toFixed(2), r.balance.toFixed(2), r.redraw.toFixed(2)].join(',')
+    ).join('\n');
+    const blob = new Blob([header+body], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'amortisation.csv';
+    a.click();
+  }
+  window._exportCSV = exportCSV;
+
+  const html = `
+  <div class="content-header">
+    <div>
+      <div class="page-title">Amortisation Schedule</div>
+      <div class="page-sub">${schedule.length} payments · ${fmtMonths(schedule.length / (periodsPerYear(L.frequency)/12))} · Scenario: <strong>${S.activeScenario}</strong></div>
+    </div>
+    <button class="btn btn-secondary" onclick="_exportCSV()">Export CSV</button>
+  </div>
+  <div class="content-body">
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-body" style="display:flex;gap:24px;align-items:center">
+        <div style="flex:1">
+          <div class="metric-label">Total Interest</div>
+          <div style="font-size:18px;font-weight:800;color:#DC2626">${fmtAUD(totalInterest)}</div>
+        </div>
+        <div style="flex:1">
+          <div class="metric-label">Total Principal</div>
+          <div style="font-size:18px;font-weight:800;color:#059669">${fmtAUD(totalPrincipal)}</div>
+        </div>
+        <div style="flex:1">
+          <div class="metric-label">Total Paid</div>
+          <div style="font-size:18px;font-weight:800;color:var(--text)">${fmtAUD(totalInterest+totalPrincipal)}</div>
+        </div>
+        <div class="filter-row">
+          ${['all','12mo'].map(f=>`<div class="filter-chip ${filter===f?'active':''}"
+            onclick="S.amortFilter='${f}';S.amortPage=0;saveState();renderAll()">${f==='all'?'Full':f==='12mo'?'First 12 Months':'Custom'}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card" style="overflow:hidden">
+      <div style="overflow-x:auto">
+        <table class="amort-table">
+          <thead><tr>
+            <th>#</th><th>Date</th>
+            <th>Payment</th><th>Interest</th><th>Principal</th>
+            <th>Balance</th><th>Redraw</th>
+          </tr></thead>
+          <tbody>
+          ${pageRows.map(r=>{
+            const hasLump = !!r.lumpTag;
+            const lumpBg = hasLump ? (r.lumpTag.type==='extra'?'background:#F0FDF4':'background:#FEF2F2') : '';
+            const lumpBadge = hasLump
+              ? (r.lumpTag.type==='extra'
+                  ? `<span class="lump-type-badge lump-extra" style="margin-left:4px">+${fmtAUD(r.lumpTag.amount)}</span>`
+                  : `<span class="lump-type-badge lump-withdraw" style="margin-left:4px">↑${fmtAUD(r.lumpTag.amount)}</span>`)
+              : '';
+            return `<tr style="${lumpBg}">
+              <td style="color:var(--muted)">${r.period}</td>
+              <td style="text-align:left;white-space:nowrap">${fmtDateFull(r.date)}${lumpBadge}</td>
+              <td>${fmtAUD(r.payment,2)}</td>
+              <td class="amort-interest">${fmtAUD(r.interest,2)}</td>
+              <td class="amort-principal">${fmtAUD(r.principal,2)}</td>
+              <td style="font-weight:800">${fmtAUD(r.balance,2)}</td>
+              <td style="color:var(--teal)">${fmtAUD(r.redraw,2)}</td>
+            </tr>`;
+          }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <div class="pager">
+          <button onclick="S.amortPage=Math.max(0,(S.amortPage||0)-1);saveState();renderAll()" ${page===0?'disabled':''}>← Prev</button>
+          <span>Page ${page+1} of ${totalPages} (${rows.length} rows)</span>
+          <button onclick="S.amortPage=Math.min(${totalPages-1},(S.amortPage||0)+1);saveState();renderAll()" ${page>=totalPages-1?'disabled':''}>Next →</button>
+        </div>
+        <div style="font-size:12px;color:var(--muted)">Showing ${pageRows.length} of ${rows.length} rows</div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('main-content').innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   RENDER — LOAN CAPACITY
+════════════════════════════════════════════════════════════════════════ */
+function renderCapacity() {
+  const C = S.capacity;
+  const cap = calcCapacity(C);
+  const currentLoan = S.loan;
+
+  // "If I extend my current loan" helper
+  const extYears = [25,30];
+  const extRows = extYears.map(y=>{
+    const pmt = calcMinRepayment(currentLoan.balance, currentLoan.annualRate, y*12, C.frequency);
+    return { years:y, repayment:pmt };
+  });
+
+  const html = `
+  <div class="content-header">
+    <div>
+      <div class="page-title">Loan Capacity</div>
+      <div class="page-sub">How much can you borrow? What can you afford?</div>
+    </div>
+  </div>
+  <div class="content-body">
+    <div class="capacity-layout">
+      <!-- Inputs -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Property & Loan</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+            <div class="field">
+              <label class="field-label">Property Value</label>
+              <div class="input-prefix"><span>$</span>
+                <input type="number" value="${C.propertyValue}" min="0" step="10000"
+                  onchange="updCap('propertyValue',+this.value)">
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label" data-tip="Loan-to-Value Ratio (e.g. 80% means 20% deposit)">Target LVR</label>
+              <div class="input-suffix"><span>%</span>
+                <input type="number" value="${C.lvr}" min="1" max="100" step="1"
+                  onchange="updCap('lvr',+this.value)">
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Annual Interest Rate</label>
+              <div class="input-suffix"><span>%</span>
+                <input type="number" value="${C.annualRate}" min="0" max="30" step="0.01"
+                  onchange="updCap('annualRate',+this.value)">
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Loan Term (years)</label>
+              <input type="number" value="${C.termYears}" min="1" max="40" step="1"
+                onchange="updCap('termYears',+this.value)">
+            </div>
+            <div class="field">
+              <label class="field-label">Repayment Frequency</label>
+              <div class="freq-pills">
+                ${['weekly','fortnightly','monthly'].map(f=>`
+                  <div class="pill ${C.frequency===f?'active':''}" onclick="updCap('frequency','${f}')">${fmtFreq(f)}</div>`).join('')}
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Max Repayment Budget</label>
+              <div class="input-prefix"><span>$</span>
+                <input type="number" value="${C.maxRepayment}" min="0" step="100"
+                  onchange="updCap('maxRepayment',+this.value)">
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">per ${fmtFreq(C.frequency).toLowerCase()} period</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <!-- Main result -->
+        <div class="capacity-result-card" style="border-top:4px solid var(--purple-l)">
+          <div class="metric-label">Maximum Serviceable Loan</div>
+          <div class="big-number" style="color:var(--purple-l);margin:10px 0 4px">${fmtAUD(cap.maxLoan)}</div>
+          <div style="font-size:13px;color:var(--muted)">Based on ${fmtAUD(C.maxRepayment,2)}/${C.frequency==='monthly'?'mo':C.frequency==='fortnightly'?'fn':'wk'} repayment budget at ${C.annualRate}% p.a. over ${C.termYears} years</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="capacity-result-card" style="border-top:4px solid var(--teal)">
+            <div class="metric-label">Deposit Required</div>
+            <div class="big-number" style="color:var(--teal);margin:8px 0 4px">${fmtAUD(cap.depositNeeded)}</div>
+            <div style="font-size:12px;color:var(--muted)">for ${fmtAUD(C.propertyValue)} property at ${C.lvr}% LVR</div>
+          </div>
+          <div class="capacity-result-card" style="border-top:4px solid var(--green)">
+            <div class="metric-label">Loan for Target Property</div>
+            <div class="big-number" style="color:var(--green);margin:8px 0 4px">${fmtAUD(cap.loanForProperty)}</div>
+            <div style="font-size:12px;color:var(--muted)">${C.lvr}% of ${fmtAUD(C.propertyValue)}</div>
+          </div>
+        </div>
+
+        <!-- Repayments for different terms -->
+        <div class="capacity-result-card">
+          <div class="card-title" style="margin-bottom:12px">Repayments for Common Terms</div>
+          <div class="term-rows">
+            ${cap.terms.map(t=>`
+              <div class="term-row">
+                <div>
+                  <div class="term-label">${t.years}-year term</div>
+                  <div style="font-size:11px;color:var(--muted)">${fmtAUD(cap.loanForProperty)} loan at ${C.annualRate}%</div>
+                </div>
+                <div class="term-value">${fmtAUD(t.repayment,2)}/${C.frequency==='monthly'?'mo':C.frequency==='fortnightly'?'fn':'wk'}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <!-- Current loan extended -->
+        <div class="capacity-result-card" style="border-top:4px solid var(--amber)">
+          <div class="card-title" style="margin-bottom:4px">Your Current Loan — Extended Terms</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
+            ${fmtAUD(currentLoan.balance)} at ${currentLoan.annualRate}% p.a.
+          </div>
+          <div class="term-rows">
+            ${extRows.map(r=>`
+              <div class="term-row">
+                <div class="term-label">${r.years}-year term</div>
+                <div class="term-value">${fmtAUD(r.repayment,2)}/${C.frequency==='monthly'?'mo':C.frequency==='fortnightly'?'fn':'wk'}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('main-content').innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   EVENT HANDLERS
+════════════════════════════════════════════════════════════════════════ */
+function updLoan(key, value) {
+  S.loan[key] = value;
+  saveState(); renderAll();
+}
+function updCap(key, value) {
+  S.capacity[key] = value;
+  saveState(); renderAll();
+}
+function addLumpSum() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  today.setMonth(today.getMonth()+1);
+  const dd = today.toISOString().split('T')[0];
+  S.loan.lumpSums.push({ date:dd, amount:10000, type:'extra' });
+  saveState(); renderAll();
+}
+function deleteLumpSum(i) {
+  S.loan.lumpSums.splice(i,1);
+  saveState(); renderAll();
+}
+function updLumpSum(i, key, value) {
+  S.loan.lumpSums[i][key] = value;
+  saveState(); renderAll();
+}
+function setTab(tab) {
+  S.activeTab = tab;
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.dataset.tab===tab);
+  });
+  saveState(); renderAll();
+}
+function wireInputs() {
+  // Lump sum delete buttons — use addEventListener so they work reliably in WKWebView
+  document.querySelectorAll('.lump-del-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() { deleteLumpSum(+this.dataset.idx); });
+  });
+  document.querySelectorAll('.lump-type-sel').forEach(function(sel) {
+    sel.addEventListener('change', function() { updLumpSum(+this.dataset.idx, 'type', this.value); });
+  });
+  document.querySelectorAll('.lump-date-inp').forEach(function(inp) {
+    inp.addEventListener('change', function() { updLumpSum(+this.dataset.idx, 'date', this.value); });
+  });
+  document.querySelectorAll('.lump-amt-inp').forEach(function(inp) {
+    inp.addEventListener('change', function() { updLumpSum(+this.dataset.idx, 'amount', +this.value); });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   RENDER ROUTER
+════════════════════════════════════════════════════════════════════════ */
+function renderAll() {
+  const tab = S.activeTab||'dashboard';
+  if (tab==='dashboard')  renderDashboard();
+  else if (tab==='schedule') renderSchedule();
+  else if (tab==='capacity') renderCapacity();
+  // Sync nav highlight
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.dataset.tab===tab);
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', ()=>{
+  // First load — if completely fresh, load the demo data for a nice first impression
+  if (!localStorage.getItem('mpState')) loadDemo();
+  else renderAll();
+});
+</script>
+</body>
+</html>
