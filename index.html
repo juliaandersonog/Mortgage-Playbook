@@ -1558,7 +1558,7 @@ function wireInputs() {
 function setHTML(html) {
   const oldBody = document.querySelector('.content-body');
   const scrollY = oldBody ? oldBody.scrollTop : 0;
-  setHTML(html);
+  document.getElementById('main-content').innerHTML = html;
   if (scrollY > 0) {
     const newBody = document.querySelector('.content-body');
     if (newBody) newBody.scrollTop = scrollY;
