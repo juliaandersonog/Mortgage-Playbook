@@ -355,6 +355,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   input[type=number],input[type=date],input[type=text],select{
     font-size:16px;min-height:42px;padding:10px 12px;
   }
+  /* Restore left padding so the $ prefix isn't covered by the number */
+  .input-prefix input{padding-left:26px}
+  .input-prefix span{font-size:15px}
   select{background-position:right 12px center}
 
   /* ── Frequency pills ── */
