@@ -253,6 +253,73 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 /* ── Slider ──────────────────────────────────────────────────────────── */
 input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:#DDD6FE;outline:none}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--purple-l);cursor:pointer;box-shadow:0 0 0 3px rgba(124,58,237,.2)}
+
+/* ── Mobile Responsive ───────────────────────────────────────────────── */
+.mobile-header{display:none}
+.mobile-nav{display:none}
+
+@media(max-width:768px){
+  html,body{height:100%;overflow:hidden}
+  #app{flex-direction:column;height:100vh;height:100dvh}
+
+  /* Hide desktop sidebar, show mobile chrome */
+  .sidebar{display:none}
+  .mobile-header{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--sidebar);padding:10px 16px;flex-shrink:0;
+    border-bottom:1px solid var(--sidebar-border);
+  }
+  .mobile-header-logo{display:flex;align-items:center;gap:8px}
+  .mobile-header-actions{display:flex;gap:6px}
+
+  /* Bottom tab bar */
+  .mobile-nav{
+    display:flex;background:var(--sidebar);
+    border-top:1px solid var(--sidebar-border);flex-shrink:0;
+  }
+  .mobile-nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;padding:8px 0 12px;color:rgba(255,255,255,.4);
+    font-size:10px;font-weight:700;cursor:pointer;
+    border-top:2px solid transparent;transition:color .15s,border-color .15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mobile-nav-item svg{width:20px;height:20px}
+  .mobile-nav-item.active{color:var(--violet);border-top-color:var(--violet)}
+
+  /* Content padding tightened */
+  .content-body{padding:14px}
+  .content-header{padding:12px 16px 10px}
+  .page-title{font-size:17px}
+  .page-sub{font-size:11.5px}
+
+  /* Dashboard: stack inputs above results */
+  .dash-layout{flex-direction:column;gap:14px}
+  .input-panel{width:100%}
+
+  /* Metrics: 2 cols on phone */
+  .metrics-grid{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+  .metric-card{padding:14px 16px}
+  .metric-value{font-size:18px}
+
+  /* Cards tighter padding */
+  .card-body{padding:12px 14px}
+  .card-header{padding:12px 14px 0}
+
+  /* Capacity: single column */
+  .capacity-layout{grid-template-columns:1fr}
+
+  /* Scenario tabs: compact */
+  .scenario-tab{font-size:11px;padding:6px 6px}
+
+  /* Pager: centred and wraps */
+  .pager{flex-wrap:wrap;justify-content:center;gap:6px}
+  .filter-row{gap:6px}
+  .filter-chip{padding:5px 10px;font-size:11px}
+
+  /* Touch-friendly inputs */
+  input[type=number],input[type=date],input[type=text],select{font-size:16px}
+}
 </style>
 </head>
 <body>
@@ -284,10 +351,38 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
   </aside>
 
+  <!-- ── Mobile Top Bar (hidden on desktop) ───────────────────── -->
+  <div class="mobile-header">
+    <div class="mobile-header-logo">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">Mortgage<br>Playbook</div>
+    </div>
+    <div class="mobile-header-actions">
+      <button class="btn-ghost" style="padding:6px 10px;font-size:11px" onclick="loadDemo()">Demo</button>
+      <button class="btn-ghost" style="padding:6px 10px;font-size:11px" onclick="resetState()">Reset</button>
+    </div>
+  </div>
+
   <!-- ── Main ──────────────────────────────────────────────────── -->
   <main class="content">
     <div id="main-content"></div>
   </main>
+
+  <!-- ── Mobile Bottom Nav (hidden on desktop) ─────────────────── -->
+  <nav class="mobile-nav">
+    <div class="mobile-nav-item active" data-tab="dashboard" onclick="setTab('dashboard')">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+      Dashboard
+    </div>
+    <div class="mobile-nav-item" data-tab="schedule" onclick="setTab('schedule')">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z"/></svg>
+      Schedule
+    </div>
+    <div class="mobile-nav-item" data-tab="capacity" onclick="setTab('capacity')">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/></svg>
+      Capacity
+    </div>
+  </nav>
 </div>
 
 <script>
@@ -1406,8 +1501,8 @@ function renderAll() {
   if (tab==='dashboard')  renderDashboard();
   else if (tab==='schedule') renderSchedule();
   else if (tab==='capacity') renderCapacity();
-  // Sync nav highlight
-  document.querySelectorAll('.nav-item').forEach(el=>{
+  // Sync nav highlight (desktop sidebar + mobile bottom nav)
+  document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(el=>{
     el.classList.toggle('active', el.dataset.tab===tab);
   });
 }
