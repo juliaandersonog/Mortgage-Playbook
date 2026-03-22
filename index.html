@@ -254,89 +254,126 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:#DDD6FE;outline:none}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--purple-l);cursor:pointer;box-shadow:0 0 0 3px rgba(124,58,237,.2)}
 
+/* ── Scenario table scroll wrapper ───────────────────────────────────── */
+.scenario-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -20px;padding:0 20px}
+
 /* ── Mobile Responsive ───────────────────────────────────────────────── */
 .mobile-header{display:none}
 .mobile-nav{display:none}
+.hide-mobile{display:table-cell} /* shown on desktop */
 
 @media(max-width:768px){
+  /* ── Shell ── */
   html,body{height:100%;overflow:hidden}
   #app{flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
-
-  /* Hide desktop sidebar, show mobile chrome */
   .sidebar{display:none}
   .content{width:100%;overflow:hidden}
   #main-content{width:100%}
 
+  /* ── Mobile top bar ── */
   .mobile-header{
     display:flex;align-items:center;justify-content:space-between;
-    background:var(--sidebar);padding:10px 16px;flex-shrink:0;
+    background:var(--sidebar);padding:0 16px;height:52px;flex-shrink:0;
     border-bottom:1px solid var(--sidebar-border);
   }
-  .mobile-header-logo{display:flex;align-items:center;gap:8px}
+  .mobile-header-logo{display:flex;align-items:center;gap:10px}
   .mobile-header-actions{display:flex;gap:6px}
 
-  /* Bottom tab bar */
+  /* ── Bottom tab bar ── */
   .mobile-nav{
     display:flex;background:var(--sidebar);
     border-top:1px solid var(--sidebar-border);flex-shrink:0;
+    padding-bottom:env(safe-area-inset-bottom); /* iPhone home bar */
   }
   .mobile-nav-item{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:3px;padding:8px 0 12px;color:rgba(255,255,255,.4);
-    font-size:10px;font-weight:700;cursor:pointer;
-    border-top:2px solid transparent;transition:color .15s,border-color .15s;
-    -webkit-tap-highlight-color:transparent;
+    gap:4px;padding:10px 0;color:rgba(255,255,255,.35);
+    font-size:10px;font-weight:700;letter-spacing:.2px;cursor:pointer;
+    border-top:2px solid transparent;transition:color .2s,border-color .2s;
+    -webkit-tap-highlight-color:transparent;user-select:none;
   }
-  .mobile-nav-item svg{width:20px;height:20px}
-  .mobile-nav-item.active{color:var(--violet);border-top-color:var(--violet)}
+  .mobile-nav-item svg{width:22px;height:22px}
+  .mobile-nav-item.active{color:#A78BFA;border-top-color:#A78BFA}
 
-  /* Content padding tightened */
-  .content-body{padding:14px;overflow-x:hidden}
-  .content-header{padding:12px 16px 10px}
-  .page-title{font-size:17px}
-  .page-sub{font-size:11.5px}
+  /* ── Page header ── */
+  .content-header{padding:14px 18px 12px;border-bottom:1px solid var(--border)}
+  .page-title{font-size:18px;letter-spacing:-.3px}
+  .page-sub{display:none} /* hide subtitle — saves vertical space on mobile */
 
-  /* KEY FIX: align-items:flex-start was preventing children from filling full width.
-     stretch makes .input-panel and .results-panel both span 100% of the column. */
-  .dash-layout{flex-direction:column;gap:14px;align-items:stretch}
+  /* ── Content body ── */
+  .content-body{
+    padding:16px;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* ── KEY FIX: stretch children to full width in column layout ── */
+  .dash-layout{flex-direction:column;gap:16px;align-items:stretch}
   .input-panel{width:100%;flex-shrink:0;min-width:0}
   .results-panel{width:100%;min-width:0}
 
-  /* Metrics: 2 cols on phone */
-  .metrics-grid{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
-  .metric-card{padding:14px 16px}
-  .metric-value{font-size:18px}
-  .metric-sub{font-size:11px}
+  /* ── Metrics grid: 2 cols ── */
+  .metrics-grid{grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:0}
+  .metric-card{padding:14px 14px 12px;border-radius:12px}
+  .metric-card::before{height:3px}
+  .metric-label{font-size:10px;margin-bottom:4px}
+  .metric-value{font-size:20px}
+  .metric-sub{font-size:11px;margin-top:3px;line-height:1.35}
 
-  /* Cards tighter padding */
-  .card-body{padding:12px 14px}
-  .card-header{padding:12px 14px 0}
+  /* ── Cards ── */
+  .card{border-radius:14px}
+  .card-header{padding:14px 16px 0}
+  .card-body{padding:12px 16px 14px}
+  .card-title{font-size:10.5px}
 
-  /* Capacity: single column */
+  /* ── Scenario tabs ── */
+  .scenario-tabs{gap:4px;padding:3px;border-radius:10px}
+  .scenario-tab{font-size:11px;padding:7px 8px;border-radius:7px;white-space:nowrap}
+
+  /* ── Scenario table: hide less-important columns, show 4 core cols ── */
+  .hide-mobile{display:none}
+  .scenario-table-wrap{margin:0 -16px;padding:0 16px}
+  .scenario-table th,.scenario-table td{padding:10px 10px}
+  .scenario-table th:first-child,.scenario-table td:first-child{padding-left:0}
+  .pmt-sub{display:none} /* hide weekly/debit line in repayment col */
+
+  /* ── Capacity ── */
   .capacity-layout{grid-template-columns:1fr}
+  .big-number{font-size:26px}
 
-  /* Scenario tabs: compact, allow wrap on very small phones */
-  .scenario-tabs{flex-wrap:wrap}
-  .scenario-tab{font-size:11px;padding:6px 8px;flex:unset;min-width:fit-content}
-
-  /* Pager: centred and wraps */
-  .pager{flex-wrap:wrap;justify-content:center;gap:6px}
+  /* ── Pager & filters ── */
+  .pager{flex-wrap:wrap;justify-content:center;gap:8px}
   .filter-row{gap:6px}
-  .filter-chip{padding:5px 10px;font-size:11px}
+  .filter-chip{padding:6px 12px;font-size:11.5px;border-radius:20px}
 
-  /* Quick buttons wrap nicely */
-  .quick-btns{gap:5px}
-  .quick-btn{font-size:10.5px;padding:4px 9px}
+  /* ── Buttons & quick inputs ── */
+  .btn{padding:10px 16px;min-height:42px}
+  .btn-sm{padding:7px 12px;min-height:36px;font-size:12px}
+  .quick-btns{gap:6px}
+  .quick-btn{font-size:11px;padding:5px 10px}
 
-  /* Touch-friendly — 16px prevents iOS auto-zoom on tap */
-  input[type=number],input[type=date],input[type=text],select{font-size:16px}
+  /* ── Touch-friendly — 16px prevents iOS auto-zoom on input tap ── */
+  input[type=number],input[type=date],input[type=text],select{
+    font-size:16px;min-height:42px;padding:10px 12px;
+  }
+  select{background-position:right 12px center}
 
-  /* Frequency pills — slightly smaller on mobile */
-  .pill{font-size:11px;padding:7px 4px}
+  /* ── Frequency pills ── */
+  .freq-pills{gap:5px}
+  .pill{font-size:11.5px;padding:8px 6px;min-height:38px}
 
-  /* Field rows stay side-by-side (intentional) but don't overflow */
+  /* ── Field rows ── */
   .field-row{min-width:0}
   .field-row .field{min-width:0}
+  .field-label{font-size:11.5px}
+
+  /* ── Slider ── */
+  input[type=range]::-webkit-slider-thumb{width:22px;height:22px}
+
+  /* ── Warning banner ── */
+  .warning-banner{font-size:12px;padding:8px 12px}
+
+  /* ── Amort table ── */
+  .amort-table th,.amort-table td{padding:8px 10px;font-size:12px}
 }
 </style>
 </head>
@@ -843,33 +880,34 @@ function renderDashboard() {
                 <div class="scenario-tab ${S.activeScenario===sc.id?'active':''}"
                      onclick="S.activeScenario='${sc.id}';saveState();renderAll()">${sc.label}</div>`).join('')}
             </div>
+            <div class="scenario-table-wrap">
             <table class="scenario-table">
               <thead><tr>
                 <th>Scenario</th><th>Repayment</th><th>Payoff Date</th>
-                <th>Time Saved</th><th>Total Interest</th><th>Interest Saved</th>
+                <th>Time Saved</th><th class="hide-mobile">Total Interest</th><th class="hide-mobile">Interest Saved</th>
               </tr></thead>
               <tbody>
               ${scenarios.map(sc=>{
                 if (!sc.stats) return `<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:14px">No data</td></tr>`;
                 const freq = L.frequency;
                 const bankAmt = sc.stats.paymentAmount;
-                // Convert to monthly for a consistent display reference
                 const bankPpy = periodsPerYear(freq);
                 const monthly = bankAmt * bankPpy / 12;
                 const weekly  = bankAmt * bankPpy / 52;
                 const pmtLabel = `<div style="font-weight:800">${fmtAUD(monthly,2)}<span style="font-weight:500;color:var(--muted)">/mo</span></div>
-                  <div style="font-size:11px;color:var(--muted)">${fmtAUD(weekly,2)}/wk &nbsp;·&nbsp; ${fmtAUD(bankAmt,2)}/${freq==='monthly'?'mo':freq==='fortnightly'?'fn':'wk'} debit</div>`;
+                  <div class="pmt-sub" style="font-size:11px;color:var(--muted)">${fmtAUD(weekly,2)}/wk &nbsp;·&nbsp; ${fmtAUD(bankAmt,2)}/${freq==='monthly'?'mo':freq==='fortnightly'?'fn':'wk'} debit</div>`;
                 return `<tr class="${S.activeScenario===sc.id?'highlight-row':''}">
                   <td style="font-weight:800;color:${sc.color}">${sc.label}</td>
                   <td>${pmtLabel}</td>
-                  <td>${fmtDateFull(sc.stats.payoffDate)}</td>
-                  <td class="${sc.stats.monthsSaved>0?'positive':''}">${sc.stats.monthsSaved>0?fmtMonths(sc.stats.monthsSaved)+' less':'—'}</td>
-                  <td>${fmtAUD(sc.stats.totalInterest)}</td>
-                  <td class="${sc.stats.interestSaved>0?'positive':''}">${sc.stats.interestSaved>1?fmtAUD(sc.stats.interestSaved):'—'}</td>
+                  <td style="white-space:nowrap">${fmtDateFull(sc.stats.payoffDate)}</td>
+                  <td class="${sc.stats.monthsSaved>0?'positive':''}" style="white-space:nowrap">${sc.stats.monthsSaved>0?fmtMonths(sc.stats.monthsSaved)+' less':'—'}</td>
+                  <td class="hide-mobile">${fmtAUD(sc.stats.totalInterest)}</td>
+                  <td class="hide-mobile ${sc.stats.interestSaved>0?'positive':''}">${sc.stats.interestSaved>1?fmtAUD(sc.stats.interestSaved):'—'}</td>
                 </tr>`;
               }).join('')}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -932,7 +970,7 @@ function renderDashboard() {
     </div>
   </div>`;
 
-  document.getElementById('main-content').innerHTML = html;
+  setHTML(html);
   wireInputs();
 
   // Draw charts
@@ -1327,7 +1365,7 @@ function renderSchedule() {
     </div>
   </div>`;
 
-  document.getElementById('main-content').innerHTML = html;
+  setHTML(html);
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -1459,7 +1497,7 @@ function renderCapacity() {
     </div>
   </div>`;
 
-  document.getElementById('main-content').innerHTML = html;
+  setHTML(html);
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -1514,6 +1552,19 @@ function wireInputs() {
 /* ════════════════════════════════════════════════════════════════════════
    RENDER ROUTER
 ════════════════════════════════════════════════════════════════════════ */
+// Replaces #main-content HTML while preserving the scroll position of .content-body.
+// Without this, every re-render (tap a tab, move a slider, etc.) jumps to the top —
+// especially noticeable on mobile where the user may be scrolled deep into the page.
+function setHTML(html) {
+  const oldBody = document.querySelector('.content-body');
+  const scrollY = oldBody ? oldBody.scrollTop : 0;
+  setHTML(html);
+  if (scrollY > 0) {
+    const newBody = document.querySelector('.content-body');
+    if (newBody) newBody.scrollTop = scrollY;
+  }
+}
+
 function renderAll() {
   const tab = S.activeTab||'dashboard';
   if (tab==='dashboard')  renderDashboard();
